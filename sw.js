@@ -6,7 +6,7 @@
    Para forzar una actualización en todos los dispositivos,
    sube los cambios y aumenta el número de versión de abajo.
    ============================================================ */
-const CACHE_VERSION = "suc-hems-gc-v2";
+const CACHE_VERSION = "suc-hems-gc-v11";
 
 const ASSETS = [
   "./",
