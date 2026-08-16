@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SUC HEMS AH-30 · Isócronas Gran Canaria</title>
+<meta name="description" content="Herramienta de apoyo a la decisión: tiempos comparados HEMS vs SVA terrestre en Gran Canaria. Servicio de Urgencias Canario.">
+
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SUC HEMS">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#A6790C">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#141719">
+
+<style>
+/* ============================================================
+   SUC HEMS AH-30 · Isócronas Gran Canaria
+   CSS propio, sin dependencias. Modo oscuro automático.
+   Paleta amarilla (identidad propia, distinta de la de Tenerife).
+   Los colores de veredicto en el mapa (verde/gris/azul) se
+   mantienen iguales a los de Tenerife: son un código de lectura
+   clínica, no de marca.
+   ============================================================ */
+:root{
+  --suc:#B8860B;
+  --suc-deep:#8C6900;
+  --suc-ink:#7A5C00;
+  --bg:#F3F1EC;
+  --surface:#FFFFFF;
+  --surface-2:#FAF8F4;
+  --ink:#1D2126;
+  --ink-2:#4A5158;
+  --ink-3:#7B838B;
+  --line:#E3DFD6;
+  --line-2:#EFECE4;
+  --ok:#1E7A3C;      --ok-bg:#E7F4EB;   --ok-line:#BFE0CB;
+  --warn:#8A6410;    --warn-bg:#FBF3DE; --warn-line:#EBDCB2;
+  --bad:#B3261E;     --bad-bg:#FBEAE8;  --bad-line:#F0C8C4;
+  --neutral-bg:#EDEAE3;
+  --hems-col:#F9F4E6;
+  --header-grad:linear-gradient(135deg,#C9971C 0%,#A6790C 60%,#7A5C00 100%);
+  --shadow:0 1px 2px rgba(29,33,38,.05),0 4px 14px rgba(29,33,38,.06);
+  --shadow-lg:0 2px 6px rgba(29,33,38,.08),0 12px 32px rgba(29,33,38,.10);
+  --radius:14px;
+  --focus:0 0 0 3px rgba(184,134,11,.35);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --suc:#FFCA28;
+    --suc-deep:#FFB300;
+    --suc-ink:#FFE082;
+    --bg:#121517;
+    --surface:#1B1F22;
+    --surface-2:#22272B;
+    --ink:#ECEDEE;
+    --ink-2:#B6BCC2;
+    --ink-3:#848C94;
+    --line:#2E353A;
+    --line-2:#272D31;
+    --ok:#66CB8C;      --ok-bg:#15281C;   --ok-line:#245B38;
+    --warn:#E4C36A;    --warn-bg:#2A2413; --warn-line:#57491F;
+    --bad:#F28B82;     --bad-bg:#301B19;  --bad-line:#5E2C28;
+    --neutral-bg:#262B2F;
+    --hems-col:#2A2410;
+    --header-grad:linear-gradient(135deg,#2A2210 0%,#1F1A0C 60%,#171207 100%);
+    --shadow:0 1px 2px rgba(0,0,0,.35),0 4px 14px rgba(0,0,0,.35);
+    --shadow-lg:0 2px 6px rgba(0,0,0,.4),0 12px 32px rgba(0,0,0,.45);
+    --focus:0 0 0 3px rgba(255,202,40,.45);
+  }
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:15px;
+  line-height:1.5;
+  -webkit-tap-highlight-color:transparent;
+  -webkit-font-smoothing:antialiased;
+}
+img{display:block;max-width:100%}
+button,input{font:inherit;color:inherit}
+:focus-visible{outline:none;box-shadow:var(--focus);border-radius:8px}
+
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+@media(min-width:640px){.wrap{padding:0 24px}}
+
+/* ---------- Cabecera ---------- */
+header.app{
+  background:var(--header-grad);
+  color:#fff;
+  padding:calc(14px + env(safe-area-inset-top)) 0 46px;
+  position:relative;
+  overflow:hidden;
+}
+header.app::after{ /* trazado de isócronas de fondo */
+  content:"";position:absolute;inset:0;pointer-events:none;opacity:.14;
+  background-image:radial-gradient(circle at 88% -30%, transparent 120px, rgba(255,255,255,.5) 121px, transparent 123px),
+    radial-gradient(circle at 88% -30%, transparent 190px, rgba(255,255,255,.4) 191px, transparent 193px),
+    radial-gradient(circle at 88% -30%, transparent 260px, rgba(255,255,255,.3) 261px, transparent 263px),
+    radial-gradient(circle at 88% -30%, transparent 330px, rgba(255,255,255,.25) 331px, transparent 333px);
+}
+.head-row{display:flex;align-items:center;gap:16px;position:relative}
+.logo-card{
+  background:#fff;border-radius:12px;padding:8px 12px;
+  width:132px;height:62px;display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 10px rgba(0,0,0,.25);flex-shrink:0;
+}
+.logo-card img{max-height:100%;object-fit:contain}
+.head-title{flex:1;min-width:0}
+.head-title h1{
+  margin:0;font-size:clamp(1.25rem,3.5vw,1.7rem);font-weight:800;
+  letter-spacing:-.02em;line-height:1.1;
+}
+.head-title .sub{
+  margin:4px 0 0;font-size:.72rem;font-weight:700;letter-spacing:.14em;
+  text-transform:uppercase;color:rgba(255,255,255,.85);
+}
+.hems-badge{width:58px;height:58px;flex-shrink:0;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3))}
+@media(max-width:420px){.hems-badge{width:46px;height:46px}.logo-card{width:104px;height:52px}}
+
+.head-actions{display:flex;gap:8px;margin-left:auto;align-items:center}
+.chip-offline{
+  display:none;align-items:center;gap:6px;background:#E4A11B;color:#2A2005;
+  font-size:.7rem;font-weight:800;padding:6px 10px;border-radius:999px;
+}
+.chip-offline.show{display:flex}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);
+  color:#fff;font-size:.78rem;font-weight:700;padding:8px 12px;border-radius:10px;
+  cursor:pointer;transition:background .15s;
+}
+.btn-ghost:hover{background:rgba(255,255,255,.24)}
+
+/* mini-nav de anclas */
+nav.jump{
+  display:flex;gap:8px;margin-top:18px;position:relative;flex-wrap:wrap;
+}
+nav.jump a{
+  color:#fff;text-decoration:none;font-size:.78rem;font-weight:700;
+  padding:7px 14px;border-radius:999px;background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.2);transition:background .15s;
+}
+nav.jump a:hover{background:rgba(255,255,255,.24)}
+
+/* ---------- Barra de decisión (pegajosa) ---------- */
+.decision-bar{
+  position:sticky;top:0;z-index:40;
+  margin-top:-30px;
+}
+.decision-inner{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow-lg);
+  padding:14px 16px;
+  display:grid;gap:12px;
+  grid-template-columns:1fr;
+}
+@media(min-width:720px){.decision-inner{grid-template-columns:1.2fr 1fr;align-items:center;gap:20px}}
+
+.search-box{position:relative}
+.search-box svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-3)}
+.search-box input{
+  width:100%;padding:11px 12px 11px 40px;
+  background:var(--surface-2);border:1.5px solid var(--line);border-radius:11px;
+  font-size:.95rem;transition:border-color .15s;
+}
+.search-box input::placeholder{color:var(--ink-3)}
+.search-box input:focus{border-color:var(--suc);box-shadow:none;outline:none}
+
+.mob-control{display:flex;flex-direction:column;gap:5px}
+.mob-label{display:flex;justify-content:space-between;font-size:.78rem;font-weight:700;color:var(--ink-2)}
+.mob-label strong{color:var(--suc);font-variant-numeric:tabular-nums}
+input[type=range]{
+  -webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;
+  background:linear-gradient(to right,var(--suc) var(--fill,33%),var(--line) var(--fill,33%));
+  cursor:pointer;margin:6px 0 2px;
+}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none;width:22px;height:22px;border-radius:50%;
+  background:var(--suc);border:3px solid var(--surface);box-shadow:0 1px 5px rgba(0,0,0,.3);
+}
+input[type=range]::-moz-range-thumb{
+  width:16px;height:16px;border-radius:50%;background:var(--suc);
+  border:3px solid var(--surface);box-shadow:0 1px 5px rgba(0,0,0,.3);
+}
+.mob-hints{display:flex;justify-content:space-between;font-size:.68rem;color:var(--ink-3)}
+.mob-pending{margin:6px 0 0;font-size:.68rem;font-weight:700;color:var(--ink-3)}
+
+/* ---------- Secciones ---------- */
+main{padding:26px 0 40px}
+section{margin-bottom:30px;scroll-margin-top:150px}
+
+.section-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:0 0 12px;flex-wrap:wrap}
+.section-head h2{
+  margin:0;font-size:1.05rem;font-weight:800;letter-spacing:-.01em;
+  display:flex;align-items:center;gap:9px;color:var(--ink);
+}
+.section-head h2 .dot{width:9px;height:9px;border-radius:3px;background:var(--suc);flex-shrink:0}
+.section-head .meta{font-size:.75rem;color:var(--ink-3);font-weight:600}
+
+.card{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);box-shadow:var(--shadow);
+}
+
+/* Nota metodológica compacta */
+.method{
+  display:grid;gap:10px;padding:16px;font-size:.8rem;color:var(--ink-2);
+}
+@media(min-width:760px){.method{grid-template-columns:1fr 1fr}}
+.method .formula{
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:10px;
+  padding:10px 12px;line-height:1.55;
+}
+.method .formula b{color:var(--ink);display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.method .formula span{font-variant-numeric:tabular-nums}
+
+/* ---------- Tabla ---------- */
+.table-tools{display:flex;gap:8px}
+.seg{
+  display:inline-flex;background:var(--surface-2);border:1px solid var(--line);
+  border-radius:10px;padding:3px;gap:2px;
+}
+.seg button{
+  border:none;background:transparent;font-size:.72rem;font-weight:700;color:var(--ink-3);
+  padding:6px 11px;border-radius:8px;cursor:pointer;transition:all .15s;
+}
+.seg button.on{background:var(--suc);color:#fff}
+
+.table-scroller{overflow:auto;max-height:560px;border-radius:0 0 var(--radius) var(--radius)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}
+thead th{
+  position:sticky;top:0;z-index:5;
+  background:var(--surface-2);
+  font-size:.66rem;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink-3);text-align:center;padding:11px 8px;
+  border-bottom:1.5px solid var(--line);white-space:nowrap;
+}
+thead th:first-child{text-align:left;padding-left:18px}
+thead th.col-hems{background:var(--hems-col);color:var(--suc-ink)}
+thead th:last-child{padding-right:18px;text-align:right}
+tbody td{
+  padding:10px 8px;text-align:center;border-bottom:1px solid var(--line-2);
+  font-variant-numeric:tabular-nums;color:var(--ink-2);
+}
+tbody td:first-child{
+  text-align:left;padding-left:18px;font-weight:700;color:var(--ink);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px;
+}
+tbody td.col-hems{background:var(--hems-col);font-weight:800;color:var(--ink)}
+tbody td:last-child{text-align:right;padding-right:14px}
+tbody tr:hover td{background:color-mix(in srgb, var(--suc) 5%, transparent)}
+tbody tr:hover td.col-hems{background:color-mix(in srgb, var(--suc) 10%, var(--hems-col))}
+tbody tr:last-child td{border-bottom:none}
+
+.verdict{
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;
+  min-width:58px;padding:4px 9px;border-radius:8px;
+  font-size:.76rem;font-weight:800;font-variant-numeric:tabular-nums;
+  border:1px solid transparent;
+}
+.verdict.ok{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)}
+.verdict.eq{color:var(--ink-2);background:var(--neutral-bg);border-color:var(--line)}
+.verdict.bad{color:var(--bad);background:var(--bad-bg);border-color:var(--bad-line)}
+
+.empty-row td{padding:22px;text-align:center;color:var(--ink-3);font-weight:600}
+
+/* Leyenda */
+.legend{
+  padding:14px 18px;border-top:1px solid var(--line-2);
+  font-size:.76rem;color:var(--ink-2);display:grid;gap:8px;
+  background:var(--surface-2);border-radius:0 0 var(--radius) var(--radius);
+}
+.legend b{color:var(--ink)}
+.legend ul{margin:2px 0 0;padding-left:18px;display:grid;gap:3px}
+.legend .v-ok{color:var(--ok);font-weight:800}
+.legend .v-eq{color:var(--ink-2);font-weight:800}
+.legend .v-bad{color:var(--bad);font-weight:800}
+
+/* ---------- Mapa ---------- */
+.map-wrap{padding:14px;display:grid;gap:14px}
+@media(min-width:900px){.map-wrap{grid-template-columns:1fr 260px;align-items:start}}
+
+.map-stage{
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:12px;
+  padding:8px;position:relative;
+}
+#mapa-svg{width:100%;height:auto;display:block;touch-action:manipulation}
+#mapa-svg .mz{
+  stroke:var(--surface);stroke-width:1.6;stroke-linejoin:round;
+  cursor:pointer;transition:opacity .12s, filter .12s;
+  fill:var(--neutral-bg);
+}
+#mapa-svg .mz.v-ok{fill:var(--map-ok)}
+#mapa-svg .mz.v-eq{fill:var(--map-eq)}
+#mapa-svg .mz.v-bad{fill:var(--map-bad)}
+#mapa-svg .mz.v-esp{fill:var(--map-eq)}
+#mapa-svg .mz[data-hereda]{opacity:.72}
+#mapa-svg .mz.dim-pendiente{opacity:.55}
+#mapa-svg .mz:hover{filter:brightness(1.09)}
+#mapa-svg .mz.sel{stroke:var(--ink);stroke-width:3}
+#mapa-svg .mz.dim{opacity:.2}
+
+/* Zonas especiales (no municipales): círculos simbólicos.
+   Relleno = color del veredicto (translúcido, deja ver la isla debajo).
+   Borde y halo = naranja pastel, para que destaquen como zonas de alta rentabilidad HEMS. */
+#mapa-svg .ze{cursor:pointer}
+#mapa-svg .ze-c{
+  fill:currentColor;fill-opacity:.42;
+  stroke:var(--zona-naranja);stroke-width:4;stroke-dasharray:9 6;stroke-linecap:round;
+  transition:fill-opacity .12s, stroke-width .12s;
+  filter:drop-shadow(0 0 7px var(--zona-halo));
+}
+#mapa-svg .ze-h{fill:none;stroke:none;pointer-events:all}
+#mapa-svg .ze.v-ok{color:var(--map-ok)}
+#mapa-svg .ze.v-eq{color:var(--map-eq)}
+#mapa-svg .ze.v-bad{color:var(--map-bad)}
+#mapa-svg .ze.v-esp{color:var(--map-eq)}
+#mapa-svg .ze:hover .ze-c{fill-opacity:.6;stroke-width:5}
+#mapa-svg .ze.sel .ze-c{stroke:var(--ink);stroke-width:4.5;fill-opacity:.7}
+#mapa-svg .ze.dim{opacity:.2}
+
+/* Marcadores: base HEMS y hospitales */
+#mapa-svg .poi{pointer-events:none}
+#mapa-svg .poi circle{stroke:#fff;stroke-width:2.5}
+#mapa-svg .poi-heli circle{fill:var(--suc)}
+#mapa-svg .poi-hosp circle{fill:#1F3A5F}
+@media (prefers-color-scheme: dark){
+  #mapa-svg .poi circle{stroke:var(--surface)}
+  #mapa-svg .poi-hosp circle{fill:#5B8DBE}
+}
+
+:root{--map-ok:#7DBF95;--map-eq:#C9C4BA;--map-bad:#5B8DBE;
+  --zona-naranja:#F0A868;--zona-halo:rgba(240,168,104,.55);}
+@media (prefers-color-scheme: dark){
+  :root{--map-ok:#3E7D58;--map-eq:#4A5158;--map-bad:#3A6389;
+    --zona-naranja:#E39A5C;--zona-halo:rgba(227,154,92,.45);}
+}
+
+/* Panel lateral de detalle */
+.map-side{display:grid;gap:10px;align-content:start}
+.map-legend{
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:12px;padding:12px 14px;
+}
+.map-legend b{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:9px}
+.lg-row{display:flex;align-items:center;gap:9px;font-size:.78rem;color:var(--ink-2);margin-bottom:7px}
+.lg-row:last-child{margin-bottom:0}
+.lg-sw{width:16px;height:16px;border-radius:5px;flex-shrink:0;border:1px solid rgba(0,0,0,.12)}
+.lg-dot{width:13px;height:13px;border-radius:50%;flex-shrink:0;border:2px solid var(--surface);box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+.lg-sep{height:1px;background:var(--line);margin:9px 0}
+.lg-circ{width:16px;height:16px;border-radius:50%;flex-shrink:0;background:var(--map-ok);border:2px dashed var(--zona-naranja);box-sizing:border-box;box-shadow:0 0 5px var(--zona-halo)}
+.md-note{margin:9px 0 0;padding-top:8px;border-top:1px dashed var(--line);font-size:.72rem;color:var(--ink-3);line-height:1.45}
+.md-note b{color:var(--ink-2)}
+
+.map-detail{
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:12px;padding:13px 15px;
+  min-height:132px;
+}
+.map-detail .mun{font-size:.95rem;font-weight:800;color:var(--ink);margin-bottom:9px;line-height:1.25}
+.map-detail .hint{font-size:.78rem;color:var(--ink-3);line-height:1.5}
+.md-row{display:flex;justify-content:space-between;align-items:center;font-size:.79rem;padding:4px 0;border-bottom:1px solid var(--line-2)}
+.md-row:last-of-type{border-bottom:none}
+.md-row span{color:var(--ink-2)}
+.md-row b{color:var(--ink);font-variant-numeric:tabular-nums;font-weight:800}
+.md-verdict{margin-top:9px;text-align:center}
+
+/* ---------- Tarjetas de criterios / ventajas ---------- */
+.two-col{display:grid;gap:18px}
+@media(min-width:860px){.two-col{grid-template-columns:1fr 1fr}}
+
+.panel{padding:18px}
+.panel h3{
+  margin:0 0 14px;font-size:.95rem;font-weight:800;display:flex;align-items:center;gap:9px;
+  padding-bottom:11px;border-bottom:1px solid var(--line-2);
+}
+.panel h3 svg{color:var(--suc);flex-shrink:0}
+
+.proto{
+  background:var(--bad-bg);border:1px solid var(--bad-line);border-radius:11px;
+  padding:13px 15px;margin-bottom:14px;
+}
+.proto b{display:block;font-size:.8rem;color:var(--bad);margin-bottom:8px}
+.proto ul{margin:0;padding-left:16px;font-size:.79rem;color:var(--ink);display:grid;gap:6px}
+.proto strong{font-weight:800}
+
+.mini-card{
+  background:var(--surface-2);border:1px solid var(--line-2);border-radius:11px;
+  padding:11px 14px;margin-bottom:9px;
+}
+.mini-card:last-child{margin-bottom:0}
+.mini-card b{display:block;font-size:.8rem;color:var(--ink);margin-bottom:2px}
+.mini-card p{margin:0;font-size:.77rem;color:var(--ink-2);line-height:1.5}
+
+.tag-list{border-radius:11px;padding:11px 14px;margin-bottom:9px;border:1px solid}
+.tag-list.ok{background:var(--ok-bg);border-color:var(--ok-line)}
+.tag-list.warn{background:var(--warn-bg);border-color:var(--warn-line)}
+.tag-list b{display:block;font-size:.8rem;margin-bottom:5px}
+.tag-list.ok b{color:var(--ok)} .tag-list.warn b{color:var(--warn)}
+.tag-list ul{margin:0;padding-left:16px;font-size:.77rem;color:var(--ink);display:grid;gap:4px}
+
+/* ---------- Pie ---------- */
+footer{
+  background:var(--surface);border-top:1px solid var(--line);
+  padding:20px 0 calc(20px + env(safe-area-inset-bottom));
+  font-size:.73rem;color:var(--ink-3);
+}
+footer .wrap{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}
+footer .ver{font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+
+/* ---------- Impresión ---------- */
+@media print{
+  body{background:#fff;color:#000;font-size:11px}
+  .no-print{display:none!important}
+  header.app{background:#A6790C!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:12px 0}
+  header.app::after{display:none}
+  .decision-bar{position:static;margin-top:8px}
+  .card,.decision-inner{box-shadow:none;border:1px solid #bbb;break-inside:avoid}
+  .table-scroller{max-height:none;overflow:visible}
+  thead th{position:static}
+  section{scroll-margin-top:0;margin-bottom:14px}
+}
+</style>
+</head>
+<body>
+
+<header class="app">
+  <div class="wrap">
+    <div class="head-row">
+      <div class="logo-card"><img src="logo-suc.png" alt="Servicio de Urgencias Canario"></div>
+      <div class="head-title">
+        <h1>HEMS AH-30 · Isócronas</h1>
+        <p class="sub">Gran Canaria · EC-145 · Base Gando</p>
+      </div>
+      <img class="hems-badge no-print" src="logo-hems.png" alt="Emblema HEMS Operativo AH-30">
+    </div>
+    <nav class="jump no-print" aria-label="Secciones">
+      <a href="#mapa">Mapa</a>
+      <a href="#tabla">Tabla</a>
+      <a href="#criterios">Criterios</a>
+      <a href="#ventajas">Ventajas</a>
+      <button class="btn-ghost" onclick="window.print()" style="margin-left:auto">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Imprimir
+      </button>
+      <span id="offline-badge" class="chip-offline" role="status">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="m2 2 20 20"/><path d="M8.5 16.5a5 5 0 0 1 7 0"/><path d="M2 8.82a15 15 0 0 1 4.17-2.65"/><path d="M10.66 5c4.01-.36 8.14.9 11.34 3.76"/><circle cx="12" cy="20" r="1"/></svg>
+        Offline
+      </span>
+    </nav>
+  </div>
+</header>
+
+<div class="decision-bar no-print">
+  <div class="wrap">
+    <div class="decision-inner">
+      <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input type="text" id="search-input" placeholder="Buscar municipio (Telde, Mogán…)" autocomplete="off" aria-label="Buscar municipio">
+      </div>
+      <div class="mob-control">
+        <div class="mob-label">
+          <span>Movilización HEMS</span>
+          <strong id="mobilization-val">5 min</strong>
+        </div>
+        <input type="range" id="mobilization-slider" min="4" max="7" value="5" step="1" aria-label="Tiempo de movilización HEMS en minutos">
+        <div class="mob-hints"><span>4 · rotor caliente</span><span>7 · frío / limitaciones</span></div>
+        <p class="mob-pending">Rango confirmado (4–7 min), igual que AH-40. Ajusta el deslizador para ver el efecto sobre el veredicto.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap">
+
+  <section id="metodo" aria-label="Metodología">
+    <div class="card method">
+      <div class="formula">
+        <b>Total HEMS</b>
+        <span>Movilización (4–7 min) + vuelo Gando→municipio + 3 min arranque en escena + vuelo municipio→hospital</span>
+      </div>
+      <div class="formula">
+        <b>Total terrestre</b>
+        <span>Movilización SVA (4 min) + base→municipio + municipio→hospital · tráfico fluido (mejor caso)</span>
+      </div>
+      <div class="formula" style="grid-column:1/-1;background:var(--warn-bg);border-color:var(--warn-line)">
+        <b style="color:var(--warn)">Horario operativo</b>
+        <span>El HEMS AH-30 opera 12 h al día (09:00–21:00). Fuera de esta franja no hay recurso aéreo disponible y la comparación se reduce a la vía terrestre.</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="pendiente" aria-label="Aviso de datos pendientes">
+    <div class="card" style="padding:14px 18px;border-color:var(--warn-line);background:var(--warn-bg)">
+      <b style="color:var(--warn);display:block;margin-bottom:4px;font-size:.85rem">⚠ Herramienta en construcción</b>
+      <span style="font-size:.8rem;color:var(--ink-2);line-height:1.5">
+        Esta es la maqueta funcional de <b>Isócronas HEMS AH-30 (Gran Canaria)</b>, clonada de la versión de Tenerife.
+        Aún <b>no hay tiempos de vuelo ni terrestres reales cargados</b>, y las <b>bases de las ambulancias SVA no están ubicadas todavía</b>.
+        La tabla y el mapa se muestran con marcadores de «pendiente» hasta que se incorporen esos datos — no hay ningún número inventado.
+      </span>
+    </div>
+  </section>
+
+  <section id="mapa">
+    <div class="section-head">
+      <h2><span class="dot"></span>Mapa de rendimiento HEMS</h2>
+      <span class="meta">Toca un municipio para ver sus tiempos</span>
+    </div>
+    <div class="card map-wrap">
+      <div class="map-stage">
+<svg id="mapa-svg" viewBox="0 0 850 903.6" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mapa de Gran Canaria por municipios">
+<g id="zonas">
+<path class="mz" data-mun="Agaete" data-nom="Agaete" d="M 179.5 279.1 L 193.2 272.2 L 199.3 254.6 L 204.0 255.2 L 221.9 242.5 L 237.4 219.3 L 243.5 207.4 L 243.2 198.2 L 240.7 188.0 L 235.2 185.5 L 236.3 192.0 L 233.0 186.5 L 236.7 175.0 L 244.8 171.9 L 244.0 155.7 L 257.0 160.4 L 266.5 157.2 L 273.8 161.9 L 290.3 180.9 L 302.1 203.8 L 314.0 207.9 L 313.0 216.6 L 324.7 218.0 L 320.2 225.1 L 323.2 234.2 L 320.3 237.7 L 333.2 245.4 L 335.1 266.0 L 320.5 271.3 L 317.6 281.6 L 302.7 284.5 L 287.7 269.7 L 272.7 285.2 L 262.6 276.5 L 231.4 303.8 L 230.8 310.4 L 214.1 318.8 L 194.4 320.1 L 182.8 314.7 L 186.3 306.3 L 175.3 286.4 L 179.5 279.1 Z M 240.1 191.4 L 240.3 192.0 L 239.9 192.0 L 240.1 191.4 Z M 239.8 191.1 L 239.5 191.9 L 239.0 191.5 L 239.8 191.1 Z"><title>Agaete</title></path>
+<path class="mz" data-mun="Agüimes" data-nom="Agüimes" d="M 777.7 631.9 L 778.7 630.7 L 778.8 632.1 L 777.7 631.9 Z M 509.0 459.9 L 523.9 464.9 L 535.7 475.3 L 546.4 476.3 L 563.3 495.4 L 576.7 490.0 L 603.9 491.2 L 615.0 498.2 L 633.2 496.5 L 665.1 538.7 L 673.4 544.1 L 696.9 546.5 L 715.0 537.4 L 722.4 539.6 L 727.1 546.9 L 734.6 544.9 L 769.5 555.1 L 757.8 578.5 L 764.1 597.4 L 771.9 600.5 L 771.8 604.8 L 779.4 604.5 L 776.3 613.4 L 770.0 614.9 L 769.6 622.0 L 774.4 626.6 L 769.8 633.2 L 771.8 638.8 L 764.7 643.5 L 750.5 641.1 L 742.6 654.1 L 753.6 661.2 L 748.9 667.5 L 751.8 662.4 L 741.0 655.4 L 734.1 656.8 L 727.0 643.9 L 705.1 631.6 L 670.6 626.1 L 659.5 618.7 L 634.4 618.2 L 620.0 610.4 L 591.8 609.4 L 569.4 599.9 L 559.9 587.5 L 561.8 579.7 L 554.7 564.6 L 549.5 515.1 L 553.0 499.6 L 530.9 484.1 L 509.0 459.9 Z"><title>Agüimes</title></path>
+<path class="mz" data-mun="Artenara" data-nom="Artenara" d="M 135.5 314.6 L 143.8 304.7 L 147.6 287.9 L 156.1 290.0 L 179.0 278.9 L 175.3 286.4 L 186.3 306.3 L 182.8 314.7 L 194.4 320.1 L 214.1 318.8 L 230.9 310.3 L 231.4 303.8 L 261.1 277.2 L 272.7 285.2 L 287.7 269.7 L 302.7 284.5 L 305.7 281.7 L 312.4 289.1 L 329.5 292.7 L 342.9 308.8 L 361.5 318.8 L 380.3 323.0 L 397.6 342.0 L 381.7 341.5 L 356.4 366.9 L 345.1 370.5 L 304.5 365.4 L 289.9 385.7 L 273.7 386.7 L 267.8 396.9 L 252.7 387.0 L 241.1 386.7 L 235.4 393.1 L 219.7 398.8 L 211.7 410.6 L 197.2 407.0 L 188.8 397.8 L 173.0 395.5 L 178.9 364.0 L 174.4 344.9 L 159.5 331.9 L 159.4 327.5 L 148.1 326.0 L 135.5 314.6 Z"><title>Artenara</title></path>
+<path class="mz" data-mun="Arucas" data-nom="Arucas" d="M 589.4 103.3 L 589.3 103.6 L 589.2 103.4 L 589.4 103.3 Z M 483.1 124.8 L 480.0 124.6 L 477.4 120.3 L 478.4 115.4 L 486.6 110.5 L 486.1 100.3 L 511.2 100.6 L 535.4 85.1 L 547.9 88.7 L 546.8 92.5 L 558.9 102.3 L 563.0 97.8 L 569.5 98.2 L 571.3 102.9 L 584.7 108.6 L 590.8 104.0 L 589.7 107.2 L 602.0 111.9 L 608.7 122.8 L 596.1 145.5 L 587.8 147.1 L 592.3 154.3 L 588.1 154.8 L 588.5 162.1 L 583.9 166.8 L 584.6 178.9 L 576.7 177.9 L 576.2 187.2 L 557.6 198.8 L 550.1 216.1 L 534.8 219.6 L 517.9 213.0 L 502.5 215.9 L 498.8 205.6 L 511.0 179.4 L 503.4 168.7 L 516.0 137.6 L 512.5 114.1 L 508.6 113.3 L 510.5 108.6 L 504.0 105.4 L 501.1 109.4 L 498.9 105.3 L 488.3 110.5 L 478.9 117.2 L 483.1 124.8 Z M 588.5 100.6 L 589.0 101.2 L 588.4 100.9 L 588.5 100.6 Z M 590.2 101.0 L 589.6 101.4 L 589.8 100.3 L 590.2 101.0 Z"><title>Arucas</title></path>
+<path class="mz" data-mun="Firgas" data-nom="Firgas" d="M 457.0 229.0 L 456.6 215.1 L 464.2 199.2 L 458.5 194.9 L 466.8 194.6 L 460.7 189.9 L 467.8 173.4 L 466.0 170.1 L 475.9 159.2 L 480.9 140.2 L 484.4 139.9 L 484.5 127.9 L 478.9 117.2 L 498.1 105.5 L 501.1 109.4 L 507.7 106.4 L 516.5 132.2 L 503.9 165.4 L 511.0 179.4 L 506.8 193.6 L 499.1 203.3 L 501.5 219.0 L 491.3 228.3 L 457.0 229.0 Z"><title>Firgas</title></path>
+<path class="mz" data-mun="Gáldar" data-nom="Gáldar" d="M 257.0 160.4 L 240.0 148.8 L 247.1 140.8 L 248.6 130.1 L 255.0 129.9 L 256.6 122.0 L 253.9 112.8 L 247.3 108.9 L 255.5 98.7 L 260.5 98.8 L 261.3 91.8 L 244.5 81.0 L 239.8 65.9 L 257.2 70.5 L 266.3 67.2 L 271.0 57.7 L 275.8 60.0 L 282.7 56.5 L 286.8 63.4 L 285.8 72.1 L 310.5 79.7 L 323.9 69.1 L 337.9 66.0 L 337.7 70.7 L 352.5 91.0 L 354.1 100.8 L 351.0 106.2 L 362.3 115.5 L 347.5 122.0 L 356.2 160.8 L 367.7 165.8 L 367.2 173.5 L 360.3 175.6 L 362.7 179.0 L 358.8 180.8 L 358.7 208.5 L 362.0 215.1 L 357.5 249.4 L 365.1 260.5 L 370.9 261.3 L 371.4 277.5 L 389.8 303.0 L 393.0 334.2 L 380.1 322.9 L 361.5 318.8 L 342.9 308.8 L 329.5 292.7 L 312.4 289.1 L 305.8 282.5 L 317.5 281.6 L 320.5 271.3 L 335.1 266.0 L 333.1 245.0 L 320.3 237.7 L 323.2 234.2 L 320.2 225.1 L 324.7 218.0 L 313.0 216.6 L 314.0 207.9 L 302.1 203.8 L 290.3 180.9 L 273.8 161.9 L 266.5 157.2 L 257.0 160.4 Z M 306.3 77.4 L 306.0 77.6 L 305.9 77.3 L 306.3 77.4 Z"><title>Gáldar</title></path>
+<path class="mz" data-mun="Ingenio" data-nom="Ingenio" d="M 509.0 459.9 L 513.9 459.8 L 510.0 456.7 L 515.4 454.7 L 525.2 457.2 L 530.2 454.3 L 540.2 464.1 L 557.4 465.9 L 568.8 462.3 L 592.5 469.4 L 640.1 463.7 L 661.5 472.6 L 685.8 472.5 L 688.0 479.4 L 696.7 479.8 L 702.3 488.8 L 711.5 491.0 L 743.1 483.2 L 768.4 491.0 L 780.9 501.3 L 772.9 511.3 L 769.6 534.5 L 773.0 544.2 L 769.5 555.1 L 734.6 544.9 L 727.1 546.9 L 722.4 539.6 L 715.0 537.4 L 705.0 544.7 L 688.6 546.9 L 665.2 538.9 L 633.2 496.5 L 615.0 498.2 L 603.9 491.2 L 576.7 490.0 L 563.3 495.4 L 546.4 476.3 L 535.7 475.3 L 523.9 464.9 L 509.0 459.9 Z"><title>Ingenio</title></path>
+<path class="mz" data-mun="Mogán" data-nom="Mogán" d="M 262.2 798.3 L 259.4 799.6 L 259.2 798.0 L 262.2 798.3 Z M 92.2 635.8 L 104.1 624.7 L 121.3 618.8 L 155.4 562.6 L 168.8 554.7 L 170.9 537.5 L 164.9 534.0 L 168.4 523.8 L 212.4 470.6 L 218.8 468.6 L 233.9 475.1 L 249.8 470.5 L 262.9 471.8 L 267.5 467.4 L 274.7 470.7 L 284.2 483.5 L 281.7 502.7 L 275.1 510.1 L 275.4 526.1 L 280.0 530.9 L 281.1 541.6 L 291.6 543.5 L 300.4 526.7 L 315.4 537.3 L 315.1 546.4 L 306.1 552.9 L 303.5 560.8 L 305.8 573.0 L 302.7 583.5 L 306.0 592.2 L 302.2 612.1 L 303.4 619.6 L 316.4 630.9 L 316.6 650.4 L 320.4 660.2 L 317.8 667.2 L 322.7 678.9 L 320.4 689.0 L 316.1 690.1 L 317.9 697.3 L 310.5 701.0 L 314.6 717.9 L 300.5 757.3 L 307.5 770.7 L 304.0 778.9 L 310.1 786.0 L 309.5 802.3 L 303.7 807.7 L 302.7 817.2 L 294.0 825.6 L 278.9 827.2 L 277.1 822.5 L 280.3 826.9 L 284.4 820.9 L 276.2 813.0 L 271.6 799.0 L 262.7 796.3 L 261.4 798.0 L 259.7 797.5 L 257.4 799.0 L 261.7 802.3 L 254.5 799.9 L 249.2 789.0 L 237.0 780.8 L 239.7 777.9 L 234.7 778.6 L 236.5 783.1 L 233.8 778.5 L 235.2 777.1 L 235.2 775.5 L 234.7 776.9 L 233.1 777.5 L 234.6 775.1 L 229.9 778.7 L 213.4 767.5 L 214.9 763.5 L 208.1 759.1 L 209.6 753.5 L 203.6 748.1 L 191.9 748.6 L 180.5 732.3 L 173.2 731.5 L 166.9 718.6 L 149.5 711.6 L 150.2 715.3 L 145.1 715.0 L 151.1 716.7 L 144.7 715.5 L 125.4 689.8 L 111.6 682.0 L 104.6 668.6 L 104.8 659.2 L 97.7 655.6 L 98.3 650.0 L 93.1 646.6 L 92.2 635.8 Z"><title>Mogán</title></path>
+<path class="mz" data-mun="Moya" data-nom="Moya" d="M 388.8 302.0 L 379.0 273.2 L 383.7 266.1 L 382.9 249.1 L 397.0 234.2 L 411.3 208.6 L 417.0 205.9 L 416.5 200.5 L 428.8 195.4 L 432.4 187.7 L 440.2 184.7 L 442.8 176.7 L 434.3 152.6 L 436.9 137.3 L 433.2 116.6 L 440.4 108.4 L 438.1 99.8 L 460.0 106.4 L 486.1 100.3 L 486.6 110.5 L 478.4 115.4 L 477.4 120.4 L 484.5 127.9 L 484.4 140.1 L 480.9 140.2 L 475.9 159.2 L 466.0 170.1 L 467.8 173.4 L 460.7 189.9 L 466.8 194.6 L 458.5 194.9 L 464.2 199.2 L 456.6 215.1 L 457.0 229.0 L 446.6 233.7 L 436.4 245.6 L 433.1 267.1 L 426.8 268.1 L 421.9 283.3 L 424.5 289.5 L 419.6 293.8 L 420.8 298.9 L 411.8 307.1 L 396.7 339.1 L 391.0 334.9 L 393.3 331.9 L 388.8 302.0 Z"><title>Moya</title></path>
+<path class="mz" data-mun="Las Palmas de Gran Canaria" data-nom="Las Palmas de Gran Canaria" d="M 643.1 135.3 L 643.2 135.1 L 643.3 135.3 L 643.1 135.3 Z M 649.0 135.0 L 649.1 135.2 L 648.8 135.1 L 649.0 135.0 Z M 641.7 134.7 L 641.9 135.1 L 641.6 135.2 L 641.7 134.7 Z M 643.2 133.6 L 643.1 133.9 L 643.0 133.7 L 643.2 133.6 Z M 644.7 133.4 L 644.4 133.8 L 644.4 133.6 L 644.7 133.4 Z M 654.4 131.9 L 653.6 133.0 L 653.3 133.0 L 654.4 131.9 Z M 666.5 127.2 L 666.4 128.1 L 666.0 127.8 L 666.5 127.2 Z M 587.4 278.0 L 567.4 285.2 L 565.6 280.3 L 549.0 283.5 L 549.5 279.3 L 543.1 280.7 L 538.9 276.1 L 548.0 266.9 L 547.8 258.0 L 556.4 243.2 L 572.8 226.6 L 571.5 222.2 L 566.9 224.4 L 559.8 217.9 L 563.9 216.5 L 562.1 211.6 L 577.6 189.9 L 576.6 178.0 L 584.6 178.9 L 583.9 166.8 L 588.5 162.1 L 588.1 154.8 L 592.3 154.3 L 587.8 147.1 L 596.1 145.5 L 604.9 132.2 L 604.6 126.5 L 611.6 120.3 L 618.6 119.8 L 636.4 139.2 L 672.8 129.8 L 696.6 100.9 L 693.0 97.7 L 696.1 92.5 L 692.7 89.4 L 693.7 81.4 L 678.2 72.3 L 678.1 64.8 L 696.8 54.0 L 714.7 36.2 L 723.3 43.7 L 726.3 43.1 L 724.3 39.9 L 736.2 42.6 L 741.7 50.6 L 739.6 64.9 L 749.9 66.9 L 750.9 73.0 L 750.4 90.5 L 750.3 74.2 L 739.6 72.7 L 736.1 126.8 L 740.6 130.6 L 740.4 148.2 L 740.3 130.8 L 735.4 126.7 L 734.8 118.9 L 736.5 79.7 L 730.9 93.4 L 722.2 99.4 L 728.7 105.9 L 728.6 112.3 L 723.3 107.9 L 722.5 114.3 L 728.5 119.5 L 728.2 135.5 L 718.8 135.2 L 718.9 101.2 L 714.7 101.1 L 712.9 110.3 L 713.1 101.0 L 710.1 106.5 L 708.2 101.0 L 706.4 108.1 L 706.5 100.9 L 702.4 100.9 L 702.7 107.7 L 713.1 118.2 L 702.4 112.0 L 700.7 120.3 L 705.7 120.1 L 706.2 115.3 L 707.1 123.7 L 703.0 126.8 L 707.3 124.2 L 700.4 130.7 L 701.2 133.9 L 708.0 132.9 L 709.8 135.3 L 701.8 134.2 L 706.3 144.3 L 706.3 137.9 L 707.2 137.7 L 707.1 136.3 L 708.4 135.3 L 708.5 147.7 L 713.4 149.0 L 724.1 168.0 L 729.6 186.4 L 727.5 204.9 L 720.9 217.6 L 726.0 233.2 L 715.4 259.7 L 726.0 275.8 L 721.5 285.4 L 728.4 292.9 L 731.6 290.4 L 733.2 291.5 L 731.3 295.0 L 738.5 304.4 L 756.2 315.6 L 744.3 320.9 L 724.3 316.5 L 720.0 304.3 L 713.3 301.6 L 683.6 311.5 L 670.3 325.8 L 657.1 328.3 L 654.7 322.6 L 662.7 319.2 L 663.4 312.5 L 656.0 305.8 L 649.4 307.5 L 645.8 300.1 L 636.2 295.6 L 620.0 265.5 L 603.7 277.7 L 587.4 278.0 Z M 679.9 117.4 L 679.7 118.7 L 678.2 119.3 L 679.9 117.4 Z M 681.5 116.9 L 680.4 116.6 L 681.5 116.7 L 681.5 116.9 Z M 682.6 115.0 L 682.6 115.7 L 682.4 115.6 L 682.6 115.0 Z M 690.8 103.0 L 683.8 113.2 L 691.1 101.8 L 690.8 103.0 Z M 691.9 87.1 L 691.2 87.3 L 691.2 87.0 L 691.9 87.1 Z M 743.1 55.8 L 742.3 56.9 L 742.2 56.7 L 743.1 55.8 Z M 744.6 53.4 L 744.1 53.6 L 744.0 53.4 L 744.6 53.4 Z M 727.3 40.0 L 727.4 40.5 L 727.1 40.3 L 727.3 40.0 Z"><title>Las Palmas de Gran Canaria</title></path>
+<path class="mz" data-mun="San Bartolomé de Tirajana" data-nom="San Bartolomé de Tirajana" d="M 287.3 827.0 L 302.2 817.8 L 303.7 807.7 L 309.5 802.3 L 310.0 785.8 L 303.9 778.5 L 307.5 770.7 L 300.2 759.5 L 314.6 717.9 L 310.5 701.0 L 317.9 697.4 L 316.1 690.1 L 320.4 689.0 L 322.6 679.3 L 317.8 667.2 L 320.4 660.2 L 316.6 650.4 L 316.4 630.9 L 303.4 619.6 L 302.2 612.3 L 306.0 592.2 L 302.7 583.4 L 304.6 555.5 L 315.1 546.4 L 314.4 539.4 L 319.4 532.8 L 329.8 530.7 L 357.5 501.4 L 359.3 494.8 L 369.8 485.2 L 366.4 483.0 L 372.5 468.5 L 398.2 461.1 L 409.2 441.3 L 416.5 437.4 L 420.9 441.9 L 418.7 449.5 L 437.6 462.9 L 449.1 458.1 L 459.2 444.1 L 469.6 442.1 L 490.2 452.4 L 501.2 465.3 L 512.5 466.7 L 513.6 478.0 L 519.2 483.6 L 515.4 501.6 L 508.3 508.9 L 490.9 511.7 L 488.6 516.0 L 500.5 538.0 L 497.1 546.5 L 501.5 549.0 L 497.6 554.8 L 498.8 568.3 L 514.0 577.0 L 515.4 582.6 L 525.6 588.7 L 524.8 595.2 L 533.7 601.2 L 530.7 607.0 L 518.6 612.3 L 526.2 616.3 L 528.5 627.9 L 536.9 639.1 L 537.0 649.6 L 558.3 650.3 L 563.5 656.8 L 582.3 664.8 L 607.7 660.2 L 621.2 651.9 L 702.8 735.2 L 692.8 740.8 L 694.6 745.3 L 692.5 747.1 L 694.0 745.1 L 691.6 741.3 L 692.3 745.4 L 652.0 748.4 L 644.5 751.3 L 644.8 755.5 L 642.3 751.6 L 626.0 757.8 L 604.2 759.3 L 569.5 782.1 L 556.1 779.5 L 537.7 789.9 L 527.9 801.2 L 484.6 814.6 L 474.4 827.3 L 469.6 860.3 L 457.5 865.0 L 421.0 867.5 L 386.8 840.5 L 377.7 844.3 L 384.7 847.1 L 372.5 847.8 L 357.1 837.7 L 342.2 836.8 L 320.8 826.0 L 303.1 831.3 L 299.5 839.4 L 306.1 842.2 L 297.7 840.5 L 287.3 827.0 Z"><title>San Bartolomé de Tirajana</title></path>
+<path class="mz" data-mun="La Aldea de San Nicolás" data-nom="La Aldea de San Nicolás" d="M 53.8 384.6 L 54.1 384.5 L 54.2 384.7 L 53.8 384.6 Z M 56.0 381.0 L 55.6 381.1 L 55.5 380.9 L 56.0 381.0 Z M 92.2 635.8 L 70.7 598.9 L 61.2 572.8 L 36.5 541.2 L 34.4 523.8 L 42.5 502.1 L 45.0 472.4 L 40.6 452.4 L 35.2 445.7 L 34.2 428.9 L 36.3 420.7 L 46.3 409.7 L 45.8 400.4 L 52.9 396.5 L 53.1 386.4 L 56.8 384.4 L 55.8 376.9 L 62.4 364.7 L 53.4 348.5 L 67.6 341.5 L 81.8 344.9 L 104.0 339.4 L 135.5 314.6 L 148.1 326.0 L 159.4 327.5 L 159.5 331.9 L 175.7 348.0 L 178.9 364.0 L 171.2 397.7 L 177.1 409.9 L 176.4 443.2 L 192.5 459.1 L 198.3 487.0 L 168.4 523.8 L 164.9 534.0 L 170.9 537.5 L 168.8 554.7 L 155.4 562.6 L 121.3 618.8 L 104.1 624.7 L 92.2 635.8 Z M 100.9 337.8 L 100.4 339.0 L 100.3 338.0 L 100.9 337.8 Z M 127.4 320.2 L 126.5 320.7 L 126.6 320.0 L 127.4 320.2 Z"><title>La Aldea de San Nicolás</title></path>
+<path class="mz" data-mun="Santa Brígida" data-nom="Santa Brígida" d="M 519.3 302.5 L 587.4 278.0 L 603.5 277.7 L 619.8 265.4 L 636.2 295.6 L 645.8 300.1 L 649.4 307.5 L 659.0 307.7 L 664.5 316.3 L 651.7 329.0 L 627.9 333.8 L 608.6 332.0 L 600.8 343.7 L 568.0 347.9 L 562.1 359.3 L 557.0 348.3 L 541.6 334.4 L 530.9 310.9 L 526.9 311.7 L 519.3 302.5 Z"><title>Santa Brígida</title></path>
+<path class="mz" data-mun="Santa Lucía de Tirajana" data-nom="Santa Lucía de Tirajana" d="M 512.5 466.7 L 553.0 499.6 L 549.5 515.1 L 554.7 564.6 L 561.8 579.7 L 559.9 587.5 L 569.3 599.8 L 591.8 609.4 L 620.0 610.4 L 634.4 618.2 L 659.5 618.7 L 670.6 626.1 L 697.5 629.1 L 712.7 634.5 L 732.6 649.4 L 734.1 656.8 L 724.5 659.0 L 717.0 672.1 L 718.1 681.4 L 711.2 688.0 L 709.6 704.9 L 713.8 714.3 L 707.9 730.8 L 702.8 735.2 L 621.2 651.9 L 607.7 660.2 L 582.1 664.8 L 563.5 656.8 L 558.3 650.3 L 535.4 647.7 L 536.9 639.1 L 528.5 627.9 L 526.2 616.3 L 518.6 612.3 L 530.7 607.0 L 533.7 601.2 L 524.8 595.2 L 525.6 588.7 L 515.4 582.6 L 514.0 577.0 L 498.8 568.3 L 497.6 554.8 L 501.5 549.0 L 497.1 546.5 L 500.5 538.0 L 488.6 516.0 L 490.9 511.7 L 508.3 508.9 L 515.4 501.6 L 519.2 483.6 L 513.6 478.0 L 512.5 466.7 Z"><title>Santa Lucía de Tirajana</title></path>
+<path class="mz" data-mun="Santa María de Guía de Gran Canaria" data-nom="Santa María de Guía de Gran Canaria" d="M 337.9 66.0 L 349.3 63.7 L 356.0 54.5 L 365.6 62.1 L 368.4 57.6 L 379.7 71.0 L 378.2 76.0 L 384.6 87.9 L 390.8 86.9 L 396.9 99.1 L 407.2 96.7 L 420.1 105.4 L 438.1 99.8 L 440.9 106.2 L 433.2 116.7 L 436.9 137.3 L 434.7 156.0 L 442.8 176.7 L 440.2 184.7 L 432.4 187.7 L 428.8 195.4 L 416.5 200.5 L 417.0 205.9 L 411.3 208.6 L 397.0 234.2 L 382.9 249.1 L 383.7 266.1 L 379.0 273.2 L 388.8 302.0 L 371.4 277.5 L 370.9 261.3 L 365.1 260.5 L 357.5 249.4 L 362.0 215.1 L 358.7 208.5 L 358.8 180.8 L 362.7 179.0 L 360.3 175.6 L 367.2 173.5 L 367.7 165.8 L 356.2 160.8 L 347.5 122.0 L 362.3 115.5 L 351.0 106.2 L 354.1 100.8 L 352.5 91.0 L 337.7 70.7 L 337.9 66.0 Z"><title>Santa María de Guía de Gran Canaria</title></path>
+<path class="mz" data-mun="Tejeda" data-nom="Tejeda" d="M 171.2 397.7 L 188.8 397.8 L 197.2 407.0 L 211.7 410.6 L 219.7 398.8 L 235.4 393.1 L 241.2 386.6 L 252.7 387.0 L 267.8 396.9 L 273.7 386.7 L 289.9 385.7 L 304.5 365.4 L 345.1 370.5 L 356.4 366.9 L 381.7 341.5 L 393.2 343.8 L 398.7 337.9 L 417.7 347.9 L 426.6 385.0 L 431.9 390.8 L 432.0 401.4 L 441.2 407.2 L 465.8 444.2 L 459.1 444.2 L 451.7 455.8 L 438.0 462.9 L 418.7 449.5 L 421.0 442.1 L 417.8 437.9 L 410.6 439.6 L 398.2 461.1 L 372.5 468.6 L 366.4 483.0 L 369.7 485.3 L 329.8 530.7 L 315.4 537.3 L 300.4 526.7 L 291.7 543.4 L 283.9 543.0 L 275.2 518.4 L 275.5 508.1 L 282.0 501.5 L 283.0 481.5 L 267.7 467.4 L 263.0 471.8 L 249.8 470.5 L 240.4 475.1 L 218.4 468.6 L 198.3 487.0 L 192.5 459.1 L 176.4 443.2 L 177.2 411.3 L 175.8 401.4 L 171.2 397.7 Z"><title>Tejeda</title></path>
+<path class="mz" data-mun="Telde" data-nom="Telde" d="M 807.8 388.3 L 807.8 385.6 L 808.8 386.9 L 807.8 388.3 Z M 814.8 487.3 L 814.6 485.7 L 815.5 486.9 L 814.8 487.3 Z M 531.2 457.0 L 541.2 461.0 L 554.9 448.8 L 565.6 449.6 L 576.6 440.3 L 587.0 439.7 L 602.8 428.2 L 609.9 414.2 L 644.0 404.7 L 645.2 392.4 L 652.1 388.6 L 646.6 378.2 L 645.9 360.6 L 631.8 357.5 L 611.3 361.7 L 593.1 347.7 L 584.4 350.4 L 578.7 348.7 L 600.8 343.7 L 608.6 332.0 L 627.9 333.8 L 653.9 326.4 L 666.7 327.3 L 683.6 311.5 L 713.5 301.6 L 720.0 304.3 L 724.3 316.5 L 744.3 320.9 L 756.2 315.6 L 763.3 320.4 L 767.6 318.3 L 771.8 342.6 L 784.5 355.7 L 791.9 356.1 L 786.0 361.2 L 790.3 369.4 L 787.9 375.0 L 790.8 381.1 L 797.1 379.9 L 796.0 384.9 L 801.2 387.6 L 801.5 392.6 L 799.2 395.1 L 800.5 389.9 L 790.0 395.6 L 783.9 403.7 L 786.4 419.7 L 778.6 418.3 L 773.5 434.5 L 776.8 441.1 L 780.0 438.1 L 783.7 442.8 L 777.6 452.4 L 785.3 459.7 L 779.0 464.4 L 780.7 470.7 L 794.9 478.7 L 799.9 477.1 L 798.3 486.5 L 811.6 491.1 L 816.0 501.7 L 810.5 506.1 L 792.8 493.1 L 780.9 501.3 L 768.4 491.0 L 743.1 483.2 L 711.4 491.0 L 702.1 488.8 L 696.7 479.8 L 688.2 479.5 L 685.8 472.5 L 661.5 472.6 L 640.1 463.7 L 592.5 469.4 L 568.8 462.3 L 557.4 465.9 L 540.2 464.1 L 531.2 457.0 Z M 771.3 322.6 L 772.2 321.7 L 772.8 321.9 L 771.3 322.6 Z M 769.2 318.6 L 770.0 318.2 L 769.4 319.3 L 769.2 318.6 Z"><title>Telde</title></path>
+<path class="mz" data-mun="Teror" data-nom="Teror" d="M 470.0 325.2 L 470.6 318.7 L 477.6 313.2 L 476.5 303.7 L 480.2 298.8 L 470.0 285.3 L 474.7 283.4 L 471.0 277.7 L 491.3 234.9 L 491.3 228.3 L 507.0 213.5 L 518.2 213.1 L 534.6 219.6 L 549.3 216.6 L 557.6 198.8 L 576.2 187.2 L 570.6 198.7 L 572.5 201.2 L 559.8 218.0 L 566.9 224.4 L 571.5 222.2 L 572.8 226.6 L 556.4 243.2 L 547.8 258.0 L 548.0 266.9 L 538.9 276.1 L 543.1 280.7 L 549.5 279.3 L 549.0 283.5 L 565.6 280.3 L 567.4 285.2 L 572.1 284.1 L 525.2 302.5 L 520.8 299.4 L 511.0 312.3 L 484.5 327.6 L 470.0 325.2 Z"><title>Teror</title></path>
+<path class="mz" data-mun="Valsequillo de Gran Canaria" data-nom="Valsequillo de Gran Canaria" d="M 494.5 458.9 L 503.0 441.2 L 503.5 393.7 L 522.9 376.6 L 531.0 376.8 L 540.1 368.8 L 551.9 371.2 L 559.9 364.9 L 568.0 347.9 L 593.1 347.7 L 611.3 361.7 L 631.9 357.5 L 648.0 362.5 L 646.6 378.2 L 652.2 388.3 L 645.2 392.4 L 643.9 404.8 L 610.0 414.1 L 596.3 433.8 L 572.4 442.3 L 565.6 449.6 L 554.9 448.8 L 541.3 461.0 L 530.2 454.3 L 525.2 457.2 L 515.4 454.7 L 510.0 456.7 L 513.9 459.8 L 509.0 459.9 L 512.5 466.7 L 509.1 467.3 L 494.5 458.9 Z"><title>Valsequillo de Gran Canaria</title></path>
+<path class="mz" data-mun="Valleseco" data-nom="Valleseco" d="M 396.7 339.1 L 411.8 307.1 L 420.8 298.9 L 426.7 268.4 L 433.0 267.2 L 437.8 247.9 L 434.6 249.0 L 440.9 239.6 L 457.0 229.0 L 491.3 228.3 L 491.3 234.9 L 471.0 277.7 L 474.7 283.4 L 470.0 285.3 L 480.2 298.8 L 476.5 303.7 L 477.6 313.2 L 470.6 318.7 L 470.0 325.2 L 441.9 346.7 L 419.3 352.3 L 412.3 342.2 L 396.7 339.1 Z"><title>Valleseco</title></path>
+<path class="mz" data-mun="Vega de San Mateo" data-nom="Vega de San Mateo" d="M 419.3 352.3 L 441.9 346.7 L 467.0 326.2 L 484.5 327.6 L 511.0 312.3 L 519.3 302.5 L 526.9 311.7 L 530.9 310.9 L 541.6 334.4 L 557.0 348.3 L 562.1 359.3 L 551.9 371.2 L 540.1 368.8 L 531.0 376.8 L 522.9 376.6 L 503.5 393.7 L 503.0 441.2 L 494.5 458.9 L 481.0 446.1 L 465.8 444.2 L 441.2 407.2 L 432.0 401.5 L 431.9 390.8 L 426.6 385.0 L 419.3 352.3 Z"><title>Vega de San Mateo</title></path>
+</g>
+<g id="pois">
+<g class="poi poi-heli" transform="translate(769.9,500.4)"><title>Base HEMS · Gando</title><circle r="13"/><path d="M -6 -1 L 6 -1 M 0 -1 L 0 4 M -4 4 L 4 4 M -7 -5 L 7 -5" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/></g>
+<g class="poi poi-hosp" transform="translate(719.6,218.3)"><title>Hospital Insular Materno-Infantil</title><circle r="11"/><path d="M 0 -5 L 0 5 M -5 0 L 5 0" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></g>
+<g class="poi poi-hosp" transform="translate(674.4,149.2)"><title>Hospital Dr. Negrín</title><circle r="11"/><path d="M 0 -5 L 0 5 M -5 0 L 5 0" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></g>
+</g>
+</svg>
+      </div>
+      <div class="map-side">
+        <div class="map-legend">
+          <b>Leyenda</b>
+          <div class="lg-row"><span class="lg-sw" style="background:var(--map-ok)"></span> Gana HEMS <span id="lg-n-ok" style="margin-left:auto;font-weight:800;color:var(--ink)"></span></div>
+          <div class="lg-row"><span class="lg-sw" style="background:var(--map-eq)"></span> Equivalente / sin datos <span id="lg-n-eq" style="margin-left:auto;font-weight:800;color:var(--ink)"></span></div>
+          <div class="lg-row"><span class="lg-sw" style="background:var(--map-bad)"></span> Gana SVA terrestre <span id="lg-n-bad" style="margin-left:auto;font-weight:800;color:var(--ink)"></span></div>
+          <div class="lg-sep"></div>
+          <div class="lg-row"><span class="lg-dot" style="background:var(--suc)"></span> Base HEMS (Gando)</div>
+          <div class="lg-row"><span class="lg-dot" style="background:#1F3A5F"></span> Hospitales (Insular / Dr. Negrín)</div>
+        </div>
+        <div class="map-detail" id="map-detail">
+          <p class="hint">Selecciona un municipio en el mapa para consultar el desglose de tiempos y el veredicto con la movilización actual.</p>
+        </div>
+      </div>
+    </div>
+    <div class="legend" style="border:1px solid var(--line);border-top:none;border-radius:0 0 var(--radius) var(--radius);margin-top:-1px">
+      <p style="margin:0"><b>Cartografía:</b> límites municipales oficiales (INE), 21 municipios de Gran Canaria. El color se recalcula automáticamente al mover el deslizador de movilización, en sincronía con la tabla.</p>
+      <p style="margin:0"><b>Estado de los datos:</b> los 21 municipios tienen ya centroide poblacional oficial (Nomenclátor Geográfico IGN, verificado habitante a habitante contra el padrón municipal), hospital de referencia asignado por Zona Básica de Salud (criterio oficial SCS), tiempo de vuelo Gando→municipio→hospital (modelo geométrico: distancia ortodrómica, velocidad crucero 243 km/h, tortuosidad 1.00–1.15 — estimación no validada por tripulación) y tiempo terrestre real por carretera (OpenRouteService, factor de corrección por prioridad 0.85) desde la base SVAm correspondiente (33.90/91, 33.92 o 33.93 según documentación operativa). El tiempo de movilización del AH-30 está confirmado en el mismo rango que el AH-40 (4–7 min). <b>Artenara, La Aldea de San Nicolás y Tejeda</b> no tienen SVAm cercano viable según esa misma documentación: se muestra su tiempo HEMS pero no hay comparador terrestre principal; La Aldea incluye además, como nota aparte no equivalente, el tiempo de su única ambulancia SVA-e (enfermería) con base en el municipio.</p>
+    </div>
+  </section>
+
+  <section id="tabla">
+    <div class="section-head">
+      <h2><span class="dot"></span>Isócronas comparadas</h2>
+      <div class="table-tools no-print">
+        <div class="seg" role="group" aria-label="Ordenar tabla">
+          <button id="sort-geo" class="on" type="button">Orden geográfico</button>
+          <button id="sort-save" type="button">Mayor ahorro</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="table-scroller">
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Municipio</th>
+              <th scope="col">Vuelo<br>Gando→Mun</th>
+              <th scope="col">Vuelo<br>Mun→Hosp</th>
+              <th scope="col">Total<br>terrestre</th>
+              <th scope="col" class="col-hems">Total<br>HEMS</th>
+              <th scope="col">Ahorro</th>
+            </tr>
+          </thead>
+          <tbody id="isocronas-tbody"></tbody>
+        </table>
+      </div>
+      <div class="legend">
+        <p style="margin:0"><b>Escenario:</b> ambos totales miden el tiempo completo desde la alerta hasta la llegada al hospital de referencia (Hospital Insular Materno-Infantil / Hospital Dr. Negrín). Criterio conservador: al HEMS se le imputan 3 min de arranque en escena; al SVA no se le imputa tiempo de escena. Tiempos terrestres en tráfico fluido; en hora punta en las vías GC-1/GC-2/GC-3 el ahorro real del HEMS aumenta.</p>
+        <ul>
+          <li><span class="v-ok">+N</span> — el HEMS es más rápido: N minutos de ahorro.</li>
+          <li><span class="v-eq">≈</span> — tiempos equivalentes.</li>
+          <li><span class="v-bad">−N</span> — el SVA terrestre es más rápido. El HEMS se activaría por otros criterios: accesibilidad geográfica, complejidad clínica (TCE grave, inestabilidad hemodinámica) o capacidad de monitorización avanzada.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="two-col">
+    <section id="criterios">
+      <div class="card panel">
+        <h3>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></svg>
+          Criterios de activación HEMS
+        </h3>
+        <div class="proto">
+          <b>Protocolo operacional</b>
+          <ul>
+            <li>Paciente crítico + distancia al SVA &gt; 20–30 min → <strong>activar HEMS</strong></li>
+            <li>Evacuación al hospital útil ≥ 30 min por carretera → <strong>activar HEMS</strong></li>
+            <li>La activación HEMS <strong>no anula</strong> el SVA terrestre → se movilizan ambos</li>
+            <li>Si después no procede → <strong>se anula el HEMS</strong></li>
+            <li>Ante criterios claros → <strong>no prealertamos, activamos</strong></li>
+          </ul>
+        </div>
+        <div class="tag-list ok">
+          <b>✔ Indicaciones</b>
+          <ul>
+            <li>Código Ictus hiperagudo fuera de la corona metropolitana</li>
+            <li>IAMCEST que precise angioplastia primaria urgente</li>
+            <li>Politraumatizado crítico con compromiso cardiovascular o respiratorio</li>
+            <li>Zonas periféricas aisladas orográficamente</li>
+          </ul>
+        </div>
+        <div class="tag-list warn">
+          <b>⚠ Limitaciones</b>
+          <ul>
+            <li>Meteorología: viento racheado, calima, visibilidad &lt; 500 m</li>
+            <li>Volumen de cabina restringido frente a ambulancia SVA</li>
+            <li>Monitorización continua obligatoria en vuelo</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="ventajas">
+      <div class="card panel">
+        <h3>
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m6.4 6.4 2.8 2.8"/><path d="M2 12h4"/><path d="M20 5 12 12"/><path d="M17.5 17.5 20 20"/><circle cx="12" cy="12" r="0.5"/><path d="M12 22a10 10 0 0 0 10-10"/><path d="M2 12a10 10 0 0 0 10 10"/></svg>
+          Ventajas del transporte aéreo
+        </h3>
+        <div class="mini-card">
+          <b>Fuerzas G homogéneas</b>
+          <p>Elimina frenazos y giros bruscos que afectan a la perfusión cerebral y a la estabilidad hemodinámica.</p>
+        </div>
+        <div class="mini-card">
+          <b>Absorción de vibraciones</b>
+          <p>Vuela a &gt;12 Hz frente al transporte terrestre (0,5–8 Hz, frecuencia de resonancia de los órganos internos).</p>
+        </div>
+        <div class="mini-card">
+          <b>Disponibilidad operativa</b>
+          <p>Reduce drásticamente el tiempo de inoperatividad del SVA terrestre, evitando el vacío de cobertura en zonas periféricas.</p>
+        </div>
+        <div class="mini-card">
+          <b>Reducción de isquemia</b>
+          <p>Minutos críticos = miocardio y neuronas salvados. Código Ictus e IAM exigen la hipótesis de máxima rapidez.</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Servicio de Urgencias Canario (SUC) · Herramienta de apoyo a la coordinación sanitaria. Datos orientativos para la toma de decisiones.</span>
+    <span class="ver">v1.0 GC · Airam Acosta</span>
+  </div>
+</footer>
+
+<script>
+"use strict";
+
+/* ================= Datos =================
+   PENDIENTE: no hay tiempos de vuelo, tiempos terrestres ni bases
+   de ambulancia SVA cargados todavía para Gran Canaria. Todos los
+   campos numéricos son "null" a propósito — NINGÚN dato está
+   inventado. En cuanto se disponga de cifras reales (isócronas
+   Gando→municipio→hospital y ubicación de bases SVA), se rellenan
+   aquí igual que se hizo con Tenerife. */
+const municipios = [
+  { nombre:"Agaete", hospital:"Hospital Dr. Negrín", baseMun:37.1, munHosp:34.3, tfsMin:8.9, tfsMax:10.2, hospMin:6.3, hospMax:7.2, especial:false },
+  { nombre:"Agüimes", hospital:"Hospital Universitario Insular", baseMun:19, munHosp:23, tfsMin:1.7, tfsMax:2, hospMin:5.7, hospMax:6.5, especial:false },
+  { nombre:"Artenara", hospital:"Hospital Dr. Negrín", baseMun:null, munHosp:null, tfsMin:6.9, tfsMax:8, hospMin:5.7, hospMax:6.5, especial:true },
+  { nombre:"Arucas", hospital:"Hospital Dr. Negrín", baseMun:16.2, munHosp:13.4, tfsMin:6.1, tfsMax:7, hospMin:1.8, hospMax:2.1, especial:false },
+  { nombre:"Firgas", hospital:"Hospital Dr. Negrín", baseMun:22.9, munHosp:19.9, tfsMin:6.4, tfsMax:7.4, hospMin:2.7, hospMax:3.1, especial:false },
+  { nombre:"Gáldar", hospital:"Hospital Dr. Negrín", baseMun:30.5, munHosp:27.4, tfsMin:8.8, tfsMax:10.1, hospMin:5.3, hospMax:6.1, especial:false },
+  { nombre:"Ingenio", hospital:"Hospital Universitario Insular", baseMun:19.5, munHosp:22.9, tfsMin:1, tfsMax:1.2, hospMin:4.6, hospMax:5.3, especial:false },
+  { nombre:"Mogán", hospital:"Hospital Universitario Insular", baseMun:12.6, munHosp:42.6, tfsMin:8.5, tfsMax:9.7, hospMin:10.4, hospMax:12, especial:false },
+  { nombre:"Moya", hospital:"Hospital Dr. Negrín", baseMun:25.6, munHosp:21.9, tfsMin:6.9, tfsMax:7.9, hospMin:3.3, hospMax:3.8, especial:false },
+  { nombre:"Las Palmas de Gran Canaria", hospital:"Hospital Dr. Negrín", baseMun:12.7, munHosp:14.3, tfsMin:4.6, tfsMax:5.3, hospMin:0.8, hospMax:1, especial:false },
+  { nombre:"San Bartolomé de Tirajana", hospital:"Hospital Universitario Insular", baseMun:8.4, munHosp:33.8, tfsMin:6.3, tfsMax:7.2, hospMin:9.3, hospMax:10.7, especial:false },
+  { nombre:"La Aldea de San Nicolás", hospital:"Hospital Dr. Negrín", baseMun:null, munHosp:null, tfsMin:9.7, tfsMax:11.1, hospMin:9.1, hospMax:10.4, especial:true, svaE:{ baseUsed:"81", baseMun:15, munHosp:67.7, total:86.7 } },
+  { nombre:"Santa Brígida", hospital:"Hospital Dr. Negrín", baseMun:17.5, munHosp:17.2, tfsMin:3.8, tfsMax:4.4, hospMin:2.6, hospMax:3, especial:false },
+  { nombre:"Santa Lucía de Tirajana", hospital:"Hospital Universitario Insular", baseMun:23, munHosp:25.9, tfsMin:2.7, tfsMax:3.1, hospMin:6.5, hospMax:7.4, especial:false },
+  { nombre:"Santa María de Guía de Gran Canaria", hospital:"Hospital Dr. Negrín", baseMun:29.8, munHosp:25.9, tfsMin:8, tfsMax:9.2, hospMin:4.4, hospMax:5.1, especial:false },
+  { nombre:"Tejeda", hospital:"Hospital Dr. Negrín", baseMun:null, munHosp:null, tfsMin:5.9, tfsMax:6.8, hospMin:5.6, hospMax:6.5, especial:true },
+  { nombre:"Telde", hospital:"Hospital Universitario Insular", baseMun:8.6, munHosp:14.6, tfsMin:2, tfsMax:2.3, hospMin:2.3, hospMax:2.6, especial:false },
+  { nombre:"Teror", hospital:"Hospital Dr. Negrín", baseMun:25.2, munHosp:24.8, tfsMin:5.2, tfsMax:6, hospMin:2.8, hospMax:3.3, especial:false },
+  { nombre:"Valsequillo de Gran Canaria", hospital:"Hospital Universitario Insular", baseMun:19.4, munHosp:27.5, tfsMin:3.1, tfsMax:3.5, hospMin:3.1, hospMax:3.6, especial:false },
+  { nombre:"Valleseco", hospital:"Hospital Dr. Negrín", baseMun:34.6, munHosp:31.7, tfsMin:5.6, tfsMax:6.5, hospMin:3.7, hospMax:4.3, especial:false },
+  { nombre:"Vega de San Mateo", hospital:"Hospital Dr. Negrín", baseMun:31.8, munHosp:32, tfsMin:4.4, tfsMax:5, hospMin:3.9, hospMax:4.5, especial:false }
+];
+
+/* ================= Estado ================= */
+let currentMobilization = 5;
+const STARTUP_ESCENA = 3;   // arranque en escena HEMS
+const MOV_SVA = 4;          // movilización SVA terrestre
+let sortMode = "geo";       // "geo" | "save"
+
+const slider  = document.getElementById("mobilization-slider");
+const mobVal  = document.getElementById("mobilization-val");
+const tbody   = document.getElementById("isocronas-tbody");
+const search  = document.getElementById("search-input");
+const btnGeo  = document.getElementById("sort-geo");
+const btnSave = document.getElementById("sort-save");
+
+const media = (a,b) => Math.round((a+b)/2);
+const r1 = (n) => Math.round(n*10)/10; // redondeo a 1 decimal, evita 14.600000000000001
+
+function calcular(m){
+  // Sin datos de vuelo cargados todavía: no se inventa ningún tiempo.
+  if (m.tfsMin == null || m.tfsMax == null || m.hospMin == null || m.hospMax == null){
+    return { tfs:null, hosp:null, hems:null, terr:null, ahorro:null, pendiente:true, sinSva:false };
+  }
+  const tfs  = media(m.tfsMin, m.tfsMax);
+  const hosp = media(m.hospMin, m.hospMax);
+  const hems = r1(currentMobilization + tfs + STARTUP_ESCENA + hosp);
+
+  // Caso especial: municipio sin SVAm cercano viable (Artenara, La Aldea, Tejeda según
+  // documentación operativa del SUC). El vuelo HEMS sí es calculable; el comparador
+  // terrestre no existe, así que no se inventa un "terr" ni un "ahorro".
+  if (m.especial || m.baseMun == null || m.munHosp == null){
+    return { tfs, hosp, hems, terr:null, ahorro:null, pendiente:false, sinSva:true };
+  }
+
+  const terr = r1(MOV_SVA + m.baseMun + m.munHosp);
+  return { tfs, hosp, hems, terr, ahorro: Math.round(terr - hems), pendiente:false, sinSva:false };
+}
+
+function renderTable(){
+  const filtro = search.value.trim().toLowerCase();
+  let lista = filtro
+    ? municipios.filter(m => m.nombre.toLowerCase().includes(filtro))
+    : municipios.slice();
+
+  const filas = lista.map(m => ({ m, c: calcular(m) }));
+  if (sortMode === "save") filas.sort((a,b) => (b.c.ahorro ?? -Infinity) - (a.c.ahorro ?? -Infinity));
+
+  if (!filas.length){
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="6">Sin resultados para «' + escapeHtml(search.value.trim()) + '»</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = filas.map(({m,c}) => {
+    if (c.pendiente){
+      return '<tr>'
+        + '<td>' + escapeHtml(m.nombre) + '</td>'
+        + '<td>—</td><td>—</td><td>—</td>'
+        + '<td class="col-hems">—</td>'
+        + '<td><span class="verdict eq">Pendiente</span></td>'
+        + '</tr>';
+    }
+    if (c.sinSva){
+      return '<tr>'
+        + '<td>' + escapeHtml(m.nombre) + '</td>'
+        + '<td>' + c.tfs + '</td>'
+        + '<td>' + c.hosp + '</td>'
+        + '<td>—</td>'
+        + '<td class="col-hems">' + c.hems + '</td>'
+        + '<td><span class="verdict eq" title="Sin SVAm cercano viable, según documentación operativa del SUC">Solo HEMS</span></td>'
+        + '</tr>';
+    }
+    let v;
+    if (c.ahorro > 0)      v = '<span class="verdict ok">+' + c.ahorro + ' min</span>';
+    else if (c.ahorro === 0) v = '<span class="verdict eq">≈</span>';
+    else                   v = '<span class="verdict bad">−' + Math.abs(c.ahorro) + ' min</span>';
+    return '<tr>'
+      + '<td>' + escapeHtml(m.nombre) + '</td>'
+      + '<td>' + c.tfs + '</td>'
+      + '<td>' + c.hosp + '</td>'
+      + '<td>' + c.terr + '</td>'
+      + '<td class="col-hems">' + c.hems + '</td>'
+      + '<td>' + v + '</td>'
+      + '</tr>';
+  }).join("");
+}
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+/* ================= Mapa ================= */
+const mapSvg    = document.getElementById("mapa-svg");
+const mapDetail = document.getElementById("map-detail");
+const zonas     = mapSvg ? Array.from(mapSvg.querySelectorAll(".mz")) : [];
+const zonasEsp  = mapSvg ? Array.from(mapSvg.querySelectorAll(".ze")) : [];
+const todas     = zonas.concat(zonasEsp);   // municipios + zonas especiales
+const porNombre = Object.fromEntries(municipios.map(m => [m.nombre, m]));
+let selectedNom = null;   // nombre oficial seleccionado
+let selectedDato = null;  // entrada de datos correspondiente
+
+function claseVeredicto(c){
+  if (c.pendiente)   return "v-eq";
+  if (c.sinSva)      return "v-esp";
+  if (c.ahorro > 0)  return "v-ok";
+  if (c.ahorro === 0) return "v-eq";
+  return "v-bad";
+}
+
+function renderMapa(){
+  if (!mapSvg) return;
+  const filtro = search.value.trim().toLowerCase();
+  let nOk = 0, nEq = 0, nBad = 0;
+
+  zonas.forEach(z => {
+    const dato = z.dataset.mun;      // entrada de la tabla de datos
+    const nom  = z.dataset.nom;      // nombre oficial del municipio
+    const m = porNombre[dato];
+    if (!m) return;
+    const c = calcular(m);
+
+    z.classList.remove("v-ok","v-eq","v-bad","v-esp");
+    z.classList.add(claseVeredicto(c));
+    z.classList.toggle("dim-pendiente", !!c.pendiente);
+
+    if (c.pendiente || c.sinSva) nEq++;
+    else if (c.ahorro > 0) nOk++; else if (c.ahorro === 0) nEq++; else nBad++;
+
+    // Atenuar los que no coinciden con la búsqueda (busca por ambos nombres)
+    const coincide = !filtro
+      || nom.toLowerCase().includes(filtro)
+      || dato.toLowerCase().includes(filtro);
+    z.classList.toggle("dim", !coincide);
+
+    z.classList.toggle("sel", nom === selectedNom);
+  });
+
+  document.getElementById("lg-n-ok").textContent  = nOk;
+  document.getElementById("lg-n-eq").textContent  = nEq;
+  document.getElementById("lg-n-bad").textContent = nBad;
+
+  if (selectedNom) renderDetalle(selectedNom, selectedDato);
+}
+
+function renderDetalle(nom, dato){
+  const m = porNombre[dato];
+  if (!m) return;
+  const c = calcular(m);
+
+  if (c.pendiente){
+    mapDetail.innerHTML =
+        '<div class="mun">' + escapeHtml(nom) + '</div>'
+      + '<div class="md-row"><span>Vuelo Gando → municipio</span><b>—</b></div>'
+      + '<div class="md-row"><span>Vuelo municipio → hospital</span><b>—</b></div>'
+      + '<div class="md-row"><span>Total HEMS</span><b>—</b></div>'
+      + '<div class="md-row"><span>Total terrestre</span><b>—</b></div>'
+      + '<div class="md-verdict"><span class="verdict eq">Pendiente de datos</span></div>'
+      + '<p class="md-note">Sin tiempos de vuelo, tiempos terrestres ni base SVA cargados todavía para este municipio.</p>';
+    return;
+  }
+
+  if (c.sinSva){
+    const svaENote = m.svaE
+      ? '<p class="md-note"><b>Comparación alternativa (no equivalente):</b> la única ambulancia con base en el propio municipio es una SVA-e (enfermería, sin médico de dotación fija) — no es una SVAm continuada como las del resto de la tabla, así que no se compara en igualdad de condiciones. En casos graves puede incorporar al médico del centro de salud, con el que comparte ubicación, y salir ya medicalizada sin retraso adicional relevante; pero esto depende de que ese médico esté disponible en ese momento, a diferencia de una SVAm de dotación fija. Su tiempo total estimado hasta el hospital, con o sin esa incorporación, sería de ' + m.svaE.total + ' min (' + m.svaE.baseMun + ' min base→municipio + ' + m.svaE.munHosp + ' min municipio→hospital por carretera + 4 min de movilización), frente a los ' + c.hems + ' min del HEMS.</p>'
+      : '';
+    mapDetail.innerHTML =
+        '<div class="mun">' + escapeHtml(nom) + '</div>'
+      + '<div class="md-row"><span>Vuelo Gando → municipio</span><b>' + c.tfs + ' min</b></div>'
+      + '<div class="md-row"><span>Vuelo municipio → hospital</span><b>' + c.hosp + ' min</b></div>'
+      + '<div class="md-row"><span>Total HEMS</span><b>' + c.hems + ' min</b></div>'
+      + '<div class="md-row"><span>Total terrestre</span><b>—</b></div>'
+      + '<div class="md-verdict"><span class="verdict eq">Sin SVAm cercano viable</span></div>'
+      + '<p class="md-note">Según la documentación operativa del SUC, este municipio no cuenta con una unidad medicalizada de referencia a distancia razonable. La respuesta se resuelve con el AH-30 o mediante transferencia desde una base vecina — no hay comparador terrestre directo que calcular.</p>'
+      + svaENote;
+    return;
+  }
+
+  let chip;
+  if (c.ahorro > 0)        chip = '<span class="verdict ok">+' + c.ahorro + ' min con HEMS</span>';
+  else if (c.ahorro === 0) chip = '<span class="verdict eq">Tiempos equivalentes</span>';
+  else                     chip = '<span class="verdict bad">SVA −' + Math.abs(c.ahorro) + ' min</span>';
+
+  mapDetail.innerHTML =
+      '<div class="mun">' + escapeHtml(nom) + '</div>'
+    + '<div class="md-row"><span>Hospital de referencia</span><b>' + escapeHtml(m.hospital || '—') + '</b></div>'
+    + '<div class="md-row"><span>Vuelo Gando → municipio</span><b>' + c.tfs + ' min</b></div>'
+    + '<div class="md-row"><span>Vuelo municipio → hospital</span><b>' + c.hosp + ' min</b></div>'
+    + '<div class="md-row"><span>Total HEMS</span><b>' + c.hems + ' min</b></div>'
+    + '<div class="md-row"><span>Total terrestre</span><b>' + c.terr + ' min</b></div>'
+    + '<div class="md-verdict">' + chip + '</div>';
+}
+
+todas.forEach(z => {
+  z.addEventListener("click", () => {
+    if (selectedNom === z.dataset.nom){
+      selectedNom = null; selectedDato = null;
+      mapDetail.innerHTML = '<p class="hint">Selecciona un municipio en el mapa para consultar el desglose de tiempos y el veredicto con la movilización actual.</p>';
+    } else {
+      selectedNom  = z.dataset.nom;
+      selectedDato = z.dataset.mun;
+    }
+    renderMapa();
+  });
+});
+
+/* Repinta mapa y tabla a la vez: una sola fuente de verdad */
+function renderAll(){
+  renderTable();
+  renderMapa();
+}
+
+/* ================= Controles ================= */
+function updateSliderFill(){
+  const pct = ((currentMobilization - 4) / 3) * 100;
+  slider.style.setProperty("--fill", pct + "%");
+}
+
+slider.addEventListener("input", e => {
+  currentMobilization = parseInt(e.target.value, 10);
+  mobVal.textContent = currentMobilization + " min";
+  updateSliderFill();
+  renderAll();
+});
+
+search.addEventListener("input", renderAll);
+
+btnGeo.addEventListener("click", () => { sortMode = "geo"; btnGeo.classList.add("on"); btnSave.classList.remove("on"); renderTable(); });
+btnSave.addEventListener("click", () => { sortMode = "save"; btnSave.classList.add("on"); btnGeo.classList.remove("on"); renderTable(); });
+
+/* ================= Offline / PWA ================= */
+function updateOnlineStatus(){
+  document.getElementById("offline-badge").classList.toggle("show", !navigator.onLine);
+}
+window.addEventListener("online", updateOnlineStatus);
+window.addEventListener("offline", updateOnlineStatus);
+
+if ("serviceWorker" in navigator){
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("sw.js").catch(() => {});
+  });
+}
+
+/* ================= Inicio ================= */
+updateSliderFill();
+updateOnlineStatus();
+renderAll();
+</script>
+</body>
+</html>
