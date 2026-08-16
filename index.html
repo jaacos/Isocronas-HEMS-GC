@@ -694,7 +694,7 @@ const municipios = [
   { nombre:"Moya", hospital:"Hospital Dr. Negrín", baseMun:25.6, munHosp:21.9, tfsMin:6.9, tfsMax:7.9, hospMin:3.3, hospMax:3.8, especial:false },
   { nombre:"Las Palmas de Gran Canaria", hospital:"Hospital Dr. Negrín", baseMun:12.7, munHosp:14.3, tfsMin:4.6, tfsMax:5.3, hospMin:0.8, hospMax:1, especial:false },
   { nombre:"San Bartolomé de Tirajana", hospital:"Hospital Universitario Insular", baseMun:8.4, munHosp:33.8, tfsMin:6.3, tfsMax:7.2, hospMin:9.3, hospMax:10.7, especial:false },
-  { nombre:"La Aldea de San Nicolás", hospital:"Hospital Dr. Negrín", baseMun:null, munHosp:null, tfsMin:9.7, tfsMax:11.1, hospMin:9.1, hospMax:10.4, especial:true, svaE:{ baseUsed:"81", baseMun:15, munHosp:67.7, total:86.7 } },
+  { nombre:"La Aldea de San Nicolás", hospital:"Hospital Dr. Negrín", baseMun:null, munHosp:null, tfsMin:9.7, tfsMax:11.1, hospMin:9.1, hospMax:10.4, especial:true, svaE:{ baseUsed:"81", baseMun:15, munHosp:68, total:87 } },
   { nombre:"Santa Brígida", hospital:"Hospital Dr. Negrín", baseMun:17.5, munHosp:17.2, tfsMin:3.8, tfsMax:4.4, hospMin:2.6, hospMax:3, especial:false },
   { nombre:"Santa Lucía de Tirajana", hospital:"Hospital Universitario Insular", baseMun:23, munHosp:25.9, tfsMin:2.7, tfsMax:3.1, hospMin:6.5, hospMax:7.4, especial:false },
   { nombre:"Santa María de Guía de Gran Canaria", hospital:"Hospital Dr. Negrín", baseMun:29.8, munHosp:25.9, tfsMin:8, tfsMax:9.2, hospMin:4.4, hospMax:5.1, especial:false },
@@ -738,7 +738,7 @@ function calcular(m){
     return { tfs, hosp, hems, terr:null, ahorro:null, pendiente:false, sinSva:true };
   }
 
-  const terr = r1(MOV_SVA + m.baseMun + m.munHosp);
+  const terr = Math.round(MOV_SVA + m.baseMun + m.munHosp);
   return { tfs, hosp, hems, terr, ahorro: Math.round(terr - hems), pendiente:false, sinSva:false };
 }
 
