@@ -277,6 +277,7 @@ tbody tr:last-child td{border-bottom:none}
 .verdict.ok{color:var(--ok);background:var(--ok-bg);border-color:var(--ok-line)}
 .verdict.eq{color:var(--ink-2);background:var(--neutral-bg);border-color:var(--line)}
 .verdict.bad{color:var(--bad);background:var(--bad-bg);border-color:var(--bad-line)}
+.verdict.esp{color:var(--map-esp);background:color-mix(in srgb, var(--map-esp) 14%, transparent);border-color:var(--map-esp)}
 
 .empty-row td{padding:22px;text-align:center;color:var(--ink-3);font-weight:600}
 
@@ -300,7 +301,7 @@ tbody tr:last-child td{border-bottom:none}
   background:var(--surface-2);border:1px solid var(--line-2);border-radius:12px;
   padding:8px;position:relative;
 }
-#mapa-svg{width:100%;height:auto;display:block;touch-action:manipulation}
+#mapa-svg{width:100%;height:auto;max-height:620px;display:block;margin:0 auto;touch-action:manipulation}
 #mapa-svg .mz{
   stroke:var(--surface);stroke-width:1.6;stroke-linejoin:round;
   cursor:pointer;transition:opacity .12s, filter .12s;
@@ -309,7 +310,7 @@ tbody tr:last-child td{border-bottom:none}
 #mapa-svg .mz.v-ok{fill:var(--map-ok)}
 #mapa-svg .mz.v-eq{fill:var(--map-eq)}
 #mapa-svg .mz.v-bad{fill:var(--map-bad)}
-#mapa-svg .mz.v-esp{fill:var(--map-eq)}
+#mapa-svg .mz.v-esp{fill:var(--map-esp)}
 #mapa-svg .mz[data-hereda]{opacity:.72}
 #mapa-svg .mz.dim-pendiente{opacity:.55}
 #mapa-svg .mz:hover{filter:brightness(1.09)}
@@ -330,7 +331,7 @@ tbody tr:last-child td{border-bottom:none}
 #mapa-svg .ze.v-ok{color:var(--map-ok)}
 #mapa-svg .ze.v-eq{color:var(--map-eq)}
 #mapa-svg .ze.v-bad{color:var(--map-bad)}
-#mapa-svg .ze.v-esp{color:var(--map-eq)}
+#mapa-svg .ze.v-esp{color:var(--map-esp)}
 #mapa-svg .ze:hover .ze-c{fill-opacity:.6;stroke-width:5}
 #mapa-svg .ze.sel .ze-c{stroke:var(--ink);stroke-width:4.5;fill-opacity:.7}
 #mapa-svg .ze.dim{opacity:.2}
@@ -345,10 +346,10 @@ tbody tr:last-child td{border-bottom:none}
   #mapa-svg .poi-hosp circle{fill:#5B8DBE}
 }
 
-:root{--map-ok:#7DBF95;--map-eq:#C9C4BA;--map-bad:#5B8DBE;
+:root{--map-ok:#7DBF95;--map-eq:#C9C4BA;--map-bad:#5B8DBE;--map-esp:#D9695E;
   --zona-naranja:#F0A868;--zona-halo:rgba(240,168,104,.55);}
 @media (prefers-color-scheme: dark){
-  :root{--map-ok:#3E7D58;--map-eq:#4A5158;--map-bad:#3A6389;
+  :root{--map-ok:#3E7D58;--map-eq:#4A5158;--map-bad:#3A6389;--map-esp:#9B4B42;
     --zona-naranja:#E39A5C;--zona-halo:rgba(227,154,92,.45);}
 }
 
@@ -548,6 +549,7 @@ footer .ver{font-weight:800;letter-spacing:.08em;text-transform:uppercase}
           <div class="lg-row"><span class="lg-sw" style="background:var(--map-ok)"></span> Gana HEMS <span id="lg-n-ok" style="margin-left:auto;font-weight:800;color:var(--ink)"></span></div>
           <div class="lg-row"><span class="lg-sw" style="background:var(--map-eq)"></span> Equivalente / sin datos <span id="lg-n-eq" style="margin-left:auto;font-weight:800;color:var(--ink)"></span></div>
           <div class="lg-row"><span class="lg-sw" style="background:var(--map-bad)"></span> Gana SVA terrestre <span id="lg-n-bad" style="margin-left:auto;font-weight:800;color:var(--ink)"></span></div>
+          <div class="lg-row"><span class="lg-sw" style="background:var(--map-esp)"></span> Sin SVA cercano <span id="lg-n-esp" style="margin-left:auto;font-weight:800;color:var(--ink)"></span></div>
           <div class="lg-sep"></div>
           <div class="lg-row"><span class="lg-dot" style="background:var(--suc)"></span> Base HEMS (Gando)</div>
           <div class="lg-row"><span class="lg-dot" style="background:#1F3A5F"></span> Hospitales (Insular / Dr. Negrín)</div>
@@ -772,7 +774,7 @@ function renderTable(){
         + '<td>' + c.hosp + '</td>'
         + '<td>—</td>'
         + '<td class="col-hems">' + c.hems + '</td>'
-        + '<td><span class="verdict eq" title="Sin SVAm cercano viable, según documentación operativa del SUC">Solo HEMS</span></td>'
+        + '<td><span class="verdict esp" title="Sin SVAm cercano viable, según documentación operativa del SUC">Solo HEMS</span></td>'
         + '</tr>';
     }
     let v;
@@ -815,7 +817,7 @@ function claseVeredicto(c){
 function renderMapa(){
   if (!mapSvg) return;
   const filtro = search.value.trim().toLowerCase();
-  let nOk = 0, nEq = 0, nBad = 0;
+  let nOk = 0, nEq = 0, nBad = 0, nEsp = 0;
 
   zonas.forEach(z => {
     const dato = z.dataset.mun;      // entrada de la tabla de datos
@@ -828,7 +830,8 @@ function renderMapa(){
     z.classList.add(claseVeredicto(c));
     z.classList.toggle("dim-pendiente", !!c.pendiente);
 
-    if (c.pendiente || c.sinSva) nEq++;
+    if (c.pendiente) nEq++;
+    else if (c.sinSva) nEsp++;
     else if (c.ahorro > 0) nOk++; else if (c.ahorro === 0) nEq++; else nBad++;
 
     // Atenuar los que no coinciden con la búsqueda (busca por ambos nombres)
@@ -843,6 +846,7 @@ function renderMapa(){
   document.getElementById("lg-n-ok").textContent  = nOk;
   document.getElementById("lg-n-eq").textContent  = nEq;
   document.getElementById("lg-n-bad").textContent = nBad;
+  document.getElementById("lg-n-esp").textContent = nEsp;
 
   if (selectedNom) renderDetalle(selectedNom, selectedDato);
 }
@@ -874,7 +878,7 @@ function renderDetalle(nom, dato){
       + '<div class="md-row"><span>Vuelo municipio → hospital</span><b>' + c.hosp + ' min</b></div>'
       + '<div class="md-row"><span>Total HEMS</span><b>' + c.hems + ' min</b></div>'
       + '<div class="md-row"><span>Total terrestre</span><b>—</b></div>'
-      + '<div class="md-verdict"><span class="verdict eq">Sin SVAm cercano viable</span></div>'
+      + '<div class="md-verdict"><span class="verdict esp">Sin SVAm cercano viable</span></div>'
       + '<p class="md-note">Según la documentación operativa del SUC, este municipio no cuenta con una unidad medicalizada de referencia a distancia razonable. La respuesta se resuelve con el AH-30 o mediante transferencia desde una base vecina — no hay comparador terrestre directo que calcular.</p>'
       + svaENote;
     return;
